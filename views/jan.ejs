@@ -13,11 +13,11 @@
     <form action="/janken" method="get">
         
         <p>次は何を出す？</p>
-        <input type="radio" id="rock" name="hand" value="グー" required>
+        <input type="radio" name="hand" id="rock" value="グー" required>
         <label for="rock">グー</label><br>
-        <input type="radio" id="scissors" name="hand" value="チョキ">
+        <input type="radio" name="hand" id="scissors" value="チョキ">
         <label for="scissors">チョキ</label><br>
-        <input type="radio" id="paper" name="hand" value="パー">
+        <input type="radio" name="hand" id="paper" value="パー">
         <label for="paper">パー</label><br>
         <input type="hidden" name="win" value="<%= win %>">
         <input type="hidden" name="total" value="<%= total %>">
