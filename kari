@@ -1,5 +1,0 @@
-app.get("/janken_first",(req, res) => {
-  win = 0;
-  total = 0;
-  res.render('jan_first', {win:win, total:total});
-})
