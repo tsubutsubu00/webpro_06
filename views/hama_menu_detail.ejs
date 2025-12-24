@@ -1,0 +1,22 @@
+<!Doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>はま寿司<%= data.name %>の詳細</title>
+</head>
+<body>
+  <h2>はま寿司<%= data.name %>の詳細</h2>
+  <table>
+    <tr><th>項目</th><th>データ</th></tr>
+    <tr><td>ID</td><td><%= data.id %></td></tr>
+    <tr><td>メニュー名</td><td><%= data.name %></td></tr>
+    <tr><td>価格</td><td><%= data.price %></td></tr>
+    <tr><td>数量</td><td><%= data.suuryou %></td></tr>
+    <tr><td>お持ち帰り</td><td><%= data.omochikaeri %></td></tr>
+  </table>
+  <a href="/menu/<%= url %>/edit/<%= data.id %>">編集</a>
+  <a href="/menu/<%= url %>/delete/<%= data.id %>" onclick="return confirm('本当に <%= data.name %> を削除しますか？');">削除</a>
+  <a href="/menu">カテゴリ一覧に戻る</a>
+  <a href="/menu/<%= url %>">メニュー一覧に戻る</a>
+</body>
+</html>

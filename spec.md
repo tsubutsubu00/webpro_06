@@ -44,6 +44,7 @@ stateDiagram-v2
     * ランディングページに表示されるカテゴリ一覧表示
 * 構造
     * id : number （ID）
+    * url : string （例：limited_menu，nigiriなど）
     * tag : string （例：期間限定，にぎりなど）
 
 #### hama_limited,hama_nigiriなどの詳細カテゴリ
@@ -60,26 +61,14 @@ stateDiagram-v2
 目的 | リソース名 | HTTPメソッド | 遷移先 
 -|-|-|-|
 カテゴリ一覧 | /menu | GET | hama_menu.ejs 
-メニュー一覧 | /menu/:tag | GET | hama_menu_list.ejs 
-追加フォーム | /menu/:tag/create | GET | hama_menu_new.html 
-新規追加 | /menu/:tag | POST | /menu/:tag 
-詳細表示 | /menu/:tag/:id | GET | hama_menu_detail.ejs
-編集 | /menu/:tag/:id/edit | GET | ham_menu_edit.ejs
-更新 | /menu/:tag/:id | POST | /menu/:tag
-削除 | /menu/:tag/:id/delete | GET | /menu/:tag
+メニュー一覧 | /menu/:url | GET | hama_menu_list.ejs 
+追加フォーム | /menu/:url/create | GET | hama_menu_new.html 
+新規追加 | /menu/:url | POST | /menu/:url 
+詳細表示 | /menu/:url/:number | GET | hama_menu_detail.ejs
+編集 | /menu/:url/:number/edit | GET | hama_menu_edit.ejs
+更新 | /menu/:url/:number | POST | /menu/:url
+削除 | /menu/:url/:number/delete | GET | /menu/:url
 
-
-<!-- 期間限定 | /limited_menu | GET | hama_limited.ejs
-にぎり | /nigiri | GET | hama_nigiri.ejs
-肉握り | /niku_nigiri | GET | hama_niku_nigiri.ejs
-軍艦・細巻き・その他 | /gunkan_hosomaki_sonota | GET | hama_gunkan.ejs
-贅沢握り・三種盛り | /zeitaku_sanshu | GET | hama_zeitaku.ejs
-至福の一貫 | /shifuku_no_ikkan | GET | hama_shifuku.ejs
-サイドメニュー | /side_menu | GET | hama_side.ejs
-デザート・ドリンク | /dessert_drink | GET | hama_dessert.ejs
-アルコール | /alcohol | GET | hama_alcohol.ejs
-はまっこセット | /kids_menu | GET | hama_kids.ejs -->
-<!-- * CRUDに則って作成できていないため，どの部分にそれを使うか検討中:thinking: -->
 
 ### ページ遷移図
 ```mermaid
@@ -102,7 +91,6 @@ stateDiagram-v2
     登録 --> カテゴリ一覧: カテゴリ一覧に戻る
     
     削除 --> メニュー一覧
-    削除 --> カテゴリ一覧
 
 ```
 

@@ -89,6 +89,7 @@ app.get("/keiyo2/edit/:number", (req, res) => {
 app.post("/keiyo2/update/:number", (req, res) => {
   // 本来は変更する番号が存在するか，各項目が正しいか厳重にチェックする
   // 本来ならここにDBとのやり取りが入る
+  station2[req.params.number].id = req.body.id;
   station2[req.params.number].code = req.body.code;
   station2[req.params.number].name = req.body.name;
   station2[req.params.number].change = req.body.change;

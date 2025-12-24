@@ -1,11 +1,21 @@
-<!DOCTYPE html>
-<nav>
-  <a href="/public/index.html">Home</a> |
-  <a href="/intro.html">自己紹介</a> |
-  <a href="/hobby.html">趣味</a> |
-  <a href="/english">English</a> |
-  <a href="/france">France</a> |
-  <a href="/germany">Germany</a> |
-  <a href="/omikuji2">おみくじ</a>
-</nav>
-<hr>
+<!Doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>はま寿司メニュー一覧</title>
+</head>
+<body>
+  <h2>はま寿司：メニュー一覧</h2>
+  <table>
+    <tr><th>ID</th><th>メニュー</th></tr>
+      <% let number = 0 %>
+      <% for( let row of data ) { %>
+        <tr><td><%= row.id %></td>
+        <td><a href="/menu/<%= url %>/<%= row.id %>"><%= row.name %></a></td>
+        <% number += 1 %>
+      <% } %>
+  </table>
+  <a href="/menu">カテゴリ一覧に戻る</a>
+  <a href="/menu/<%= url %>/create">追加</a>
+</body>
+</html>

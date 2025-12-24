@@ -5,16 +5,16 @@ app.use("/public", express.static(__dirname + "/public"));
 app.use(express.urlencoded({ extended: true }));
 
 let hama_menu = [
-    {id:1, tag:"期間限定"},
-    {id:2, tag:"にぎり"},
-    {id:3, tag:"肉握り"},
-    {id:4, tag:"軍艦・細巻き・その他"},
-    {id:5, tag:"贅沢握り・三種盛り"},
-    {id:6, tag:"至福の一貫"},
-    {id:7, tag:"サイドメニュー"},
-    {id:8, tag:"デザート・ドリンク"},
-    {id:9, tag:"アルコール"},
-    {id:10, tag:"はまっこセット"},
+    {id:1, url: "limited_menu", tag:"期間限定"},
+    {id:2, url: "nigiri", tag:"にぎり"},
+    {id:3, url: "niku_nigiri", tag:"肉握り"},
+    {id:4, url: "gunkan_hosomaki_sonota", tag:"軍艦・細巻き・その他"},
+    {id:5, url: "zeitaku_sanshu", tag:"贅沢握り・三種盛り"},
+    {id:6, url: "shifuku_no_ikkan", tag:"至福の一貫"},
+    {id:7, url: "side_menu", tag:"サイドメニュー"},
+    {id:8, url: "dessert_drink", tag:"デザート・ドリンク"},
+    {id:9, url: "alcohol", tag:"アルコール"},
+    {id:10, url: "kids_menu", tag:"はまっこセット"},
 ];
 
 let hama_limited = [
@@ -64,7 +64,7 @@ let hama_limited = [
   {id:44, name:"ゆずレモン（メガサイズ）", price:"363円（税込）", suuryou:"1個", omochikaeri:"お持ち帰り不可", },
   {id:45, name:"ゆずレモンスパークリング（メガサイズ）", price:"363円（税込）", suuryou:"1個", omochikaeri:"お持ち帰り不可", },
   {id:46, name:"なっちゃんオレンジ（メガサイズ）", price:"363円（税込）", suuryou:"1個", omochikaeri:"お持ち帰り不可", },
-  {id:47, name:"高清水 大吟醸", price:"968円（税込）", suuryou:"1瓶", omochikaeri:"", },
+  {id:47, name:"高清水 大吟醸", price:"968円（税込）", suuryou:"1瓶", omochikaeri:"お持ち帰り不可", },
 ];
 
 let hama_nigiri = [
@@ -333,10 +333,20 @@ let hama_kids = [
   {id:2, name:"はまっこうどんセット", price:"396円（税込）", suuryou:"うどん：1杯，ドリンク：1個，ガチャコイン：1枚", omochikaeri:"お持ち帰り不可", },
   {id:3, name:"はまっこ3点セット", price:"506円（税込）", suuryou:"カリカリポテト：1個（通常の半分の量），うどん：1杯，ドリンク：1個，ガチャドリンク：1枚", omochikaeri:"お持ち帰り不可", },
   {id:4, name:"はまっこしょう油ラーメンセット", price:"440円（税込）", suuryou:"しょう油ラーメン：1杯，ドリンク：1個，ガチャコイン：1枚", omochikaeri:"お持ち帰り不可", },
-  {id:5, name:"", price:"円（税込）", suuryou:"", omochikaeri:"お持ち帰り不可", },
-  {id:6, name:"", price:"円（税込）", suuryou:"", omochikaeri:"お持ち帰り不可", },
 ];
 
+const hama_all_menu = {
+  "limited_menu": hama_limited,
+  "nigiri": hama_nigiri,
+  "niku_nigiri": hama_niku_nigiri,
+  "gunkan_hosomaki_sonota": hama_gunkan,
+  "zeitaku_sanshu": hama_zeitaku,
+  "shifuku_no_ikkan": hama_shifuku,
+  "side_menu": hama_side,
+  "dessert_drink": hama_dessert,
+  "alcohol": hama_alcohol,
+  "kids_menu": hama_kids,
+}
 let sumabura_data = [
     {id:1, name:"マリオ", series:"スーパーマリオ", nannido:"★★★★☆"},
     {id:2, name:"ドンキーコング", series:"ドンキーコング", nannido:"★☆☆☆☆"},
@@ -428,12 +438,90 @@ let sumabura_data = [
     {id:88, name:"カズヤ", series:"TEKKEN",nannido:"★★☆☆☆"},
     {id:89, name:"ソラ", series:"KINGDOM HEARTS",nannido:"★★★☆☆"},
 ];
+let sumabura_next_id = sumabura_data.length + 1;
 
-
+//1つ目：todoリスト
 app.get("/todo", (req, res) => {
-    res.render("todo", {data: todo});
+  res.render("todo", {data: todo});
 });
 
+
+//2つ目：はま寿司メニュー一覧
+app.get("/menu", (req, res) => {
+  res.render("hama", {data: hama_menu});
+});
+
+app.get("/menu/:url", (req, res) => {
+  const url = req.params.url;
+  const menu_list = hama_all_menu[ url ];
+  res.render("hama_menu", { url: url, data: menu_list});
+});
+
+app.get("/menu/:url/:number", (req, res) => {
+  const url = req.params.url;
+  const number = req.params.number;
+  const list = hama_all_menu[url];
+
+  let detail = null;
+  for(let i=0; i<list.length; i++) {
+    if(list[i].id == number) {
+      detail = list[i];
+      break;
+    }
+  }
+  res.render("hama_menu_detail", {url: url, number: number, data: detail});
+});
+
+app.post("/menu/:url", (req, res) => {
+  const id = hama_menu.length + 1;
+  const url = req.body.url;
+  const tag = req.body.tag;
+  hama_menu.push({id: id, url: url, tag: tag});
+  console.log(hama_menu);
+  res.render("hama", {data: hama_menu});
+});
+
+app.get("/hama/:url/create", (req, res) => {
+  const url = req.params.url;
+  res.redirect('/public/hama_new.html');
+});
+
+app.get("/menu/:url/delete/:number", (req, res) => {
+  const url = req.params.url;
+  const number = req.params.number;
+  const list = hama_all_menu[url];
+
+  let sakujo = null;
+  for(let i=0; i<list.length; i++) {
+    if(list[i].id == number) {
+      sakujo = i;
+      break;
+    }
+  }
+
+  list.splice(sakujo, 1);
+  res.redirect(`/menu/${url}`);
+});
+
+app.get("/menu/:url/edit/:number", (req, res) => {
+  const number = req.params.number;
+  const detail = hama_all_menu[req.params.url][number];
+  res.render('hama_menu_edit', {id: number, data: detail} );
+});
+
+app.post("/menu/:url/update/:number", (req, res) => {
+  const url = req.params.url;
+  hama_all_menu[req.params.url][req.params.number].id = req.body.id;
+  hama_all_menu[req.params.url][req.params.number].name = req.body.name;
+  hama_all_menu[req.params.url][req.params.number].price = req.body.price;
+  hama_all_menu[req.params.url][req.params.number].suuryou = req.body.suuryou;
+  hama_all_menu[req.params.url][req.params.number].omochikaeri = req.body.omochikaeri;
+  console.log( hama_all_menu );
+  res.redirect(`/menu/${url}`);
+});
+
+
+//3つ目：スマブラ
 app.get("/sumabura", (req, res) => {
     res.render("sumabura", {data: sumabura_data});
 });
@@ -448,31 +536,28 @@ app.get("/sumabura/:number", (req, res) => {
   res.render('sumabura_detail', {id: number, data: detail} );
 });
 
-// Delete
 app.get("/sumabura/delete/:number", (req, res) => {
   sumabura_data.splice( req.params.number, 1 );
   res.redirect('/sumabura' );
 });
 
-// Create
 app.post("/sumabura", (req, res) => {
-  const id = sumabura_data.length + 1;
+  const id = sumabura_next_id;
   const name = req.body.name;
   const series = req.body.series;
   const nannido = req.body.nannido;
   sumabura_data.push( { id: id, name: name, series: series, nannido: nannido } );
+  sumabura_next_id += 1;
   console.log( sumabura_data );
   res.render('sumabura', {data: sumabura_data} );
 });
 
-// Edit
 app.get("/sumabura/edit/:number", (req, res) => {
   const number = req.params.number;
   const detail = sumabura_data[ number ];
   res.render('sumabura_edit', {id: number, data: detail} );
 });
 
-// Update
 app.post("/sumabura/update/:number", (req, res) => {
   sumabura_data[req.params.number].id = req.body.id;
   sumabura_data[req.params.number].name = req.body.name;
@@ -480,50 +565,6 @@ app.post("/sumabura/update/:number", (req, res) => {
   sumabura_data[req.params.number].nannido = req.body.nannido;
   console.log( sumabura_data );
   res.redirect('/sumabura' );
-});
-
-app.get("/menu", (req, res) => {
-    res.render("hama_menu", {data: hama_menu});
-});
-
-app.get("/limited_menu", (req, res) => {
-    res.render("hama_limited", {data: hama_limited});
-});
-
-app.get("/nigiri", (req, res) => {
-    res.render("hama_nigiri", {data: hama_nigiri});
-});
-
-app.get("/niku_nigiri", (req, res) => {
-    res.render("hama_niku_nigiri", {data: hama_niku_nigiri});
-});
-
-app.get("/gunkan_hosomaki_sonota", (req, res) => {
-    res.render("hama_gunkan", {data: hama_gunkan});
-});
-
-app.get("/zeitaku_sanshu", (req, res) => {
-    res.render("hama_zeitaku", {data: hama_zeitaku});
-});
-
-app.get("/shifuku_no_ikkan", (req, res) => {
-    res.render("hama_shifuku", {data: hama_shifuku});
-});
-
-app.get("/side_menu", (req, res) => {
-    res.render("hama_side", {data: hama_side});
-});
-
-app.get("/dessert_drink", (req, res) => {
-    res.render("hama_dessert", {data: hama_dessert});
-});
-
-app.get("/alcohol", (req, res) => {
-    res.render("hama_alcohol", {data: hama_alcohol});
-});
-
-app.get("/kids_menu", (req, res) => {
-    res.render("hama_kids", {data: hama_kids});
 });
 
 app.listen(8080, () => console.log("Example app listening on port 8080!"));

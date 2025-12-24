@@ -9,7 +9,8 @@
   <form action="/keiyo2/update/<%= data.id - 1 %>" method="POST">
     <table>
       <tr><th>項目</th><th>データ</th></tr>
-      <tr><td>ID</td><td><input type="text" name="code" value="<%= data.id %>"></td></tr>
+      <tr><td>ID</td><td><input type="text" name="id" value="<%= data.id %>"></td></tr>
+      <tr><td>code</td><td><input type="text" name="code" value="<%= data.code %>"></td></tr>
       <tr><td>駅名</td><td><input type="text" name="name" value="<%= data.name %>"></td></tr>
       <tr><td>乗り換え線</td><td><input type="text" name="change" value="<%= data.change %>"></td></tr>
       <tr><td>乗降客数</td><td><input type="text" name="passengers" value="<%= data.passengers %>"></td></tr>

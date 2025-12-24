@@ -10,9 +10,9 @@
   - [x] ページ構造の決定
   - [ ] ドキュメントの構成の検討 :thinking:
   - [ ] 概要 :writing_hand:
-  - [ ] HTTPメソッドとリソース名一覧 :writing_hand:
+  - [x] HTTPメソッドとリソース名一覧 :writing_hand:
   - [x] データ構造 :writing_hand:
-  - [ ] リソース名ごとの機能の詳細 :writing_hand:
+  - [x] リソース名ごとの機能の詳細 :writing_hand:
 - [ ] 管理者向けドキュメントの構成
   - [ ] インストールから起動までの手順確認 :computer:
   - [ ] インストール方法 :writing_hand:

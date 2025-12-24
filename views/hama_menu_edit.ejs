@@ -1,0 +1,22 @@
+<!Doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= data.name %></title>
+</head>
+<body>
+  <h2><%= data.name %>の編集</h2>
+  <form action="/menu/<%= data.url %>/update/<%= data.id - 1 %>" method="POST">
+    <table>
+      <tr><th>項目</th><th>データ</th></tr>
+      <tr><td>ID</td><td><input type="text" name="id" value="<%= data.id %>"></td></tr>
+      <tr><td>メニュー名</td><td><input type="text" name="name" value="<%= data.name %>"></td></tr>
+      <tr><td>価格</td><td><input type="text" name="price" value="<%= data.price %>"></td></tr>
+      <tr><td>数量</td><td><input type="text" name="suuryou" value="<%= data.suuryou %>"></td></tr>
+      <tr><td>お持ち帰り</td><td><input type="text" name="omochikaeri" value="<%= data.omochikaeri %>"></td></tr>
+    </table>
+    <input type="submit" values="登録">
+  </form>
+  <a href="/menu/<%= data.url %>">メニュー一覧に戻る</a>
+</body>
+</html>

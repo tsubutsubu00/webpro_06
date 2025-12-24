@@ -2,19 +2,18 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>大乱闘スマッシュブラザーズに登場するファイター一覧</title>
+  <title>はま寿司カテゴリ一覧</title>
 </head>
 <body>
-  <h2>参戦ファイター</h2>
+  <h2>はま寿司：カテゴリ一覧</h2>
   <table>
-    <tr><th>ID</th><th>name</th></tr>
+    <tr><th>ID</th><th>カテゴリ</th></tr>
       <% let number = 0 %>
       <% for( let row of data ) { %>
         <tr><td><%= row.id %></td>
-        <td><a href="/sumabura/<%= number %>"><%= row.name %></a></td>
+        <td><a href="/menu/<%= row.url %>"><%= row.tag %></a></td>
         <% number += 1 %>
       <% } %>
   </table>
-  <a href="/sumabura/create">追加</a>
 </body>
 </html>
