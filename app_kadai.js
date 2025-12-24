@@ -346,7 +346,10 @@ const hama_all_menu = {
   "dessert_drink": hama_dessert,
   "alcohol": hama_alcohol,
   "kids_menu": hama_kids,
-}
+};
+
+let hama_next_id = hama_menu.length + 1;
+
 let sumabura_data = [
     {id:1, name:"マリオ", series:"スーパーマリオ", nannido:"★★★★☆"},
     {id:2, name:"ドンキーコング", series:"ドンキーコング", nannido:"★☆☆☆☆"},
@@ -438,11 +441,12 @@ let sumabura_data = [
     {id:88, name:"カズヤ", series:"TEKKEN",nannido:"★★☆☆☆"},
     {id:89, name:"ソラ", series:"KINGDOM HEARTS",nannido:"★★★☆☆"},
 ];
+
 let sumabura_next_id = sumabura_data.length + 1;
 
-//1つ目：todoリスト
-app.get("/todo", (req, res) => {
-  res.render("todo", {data: todo});
+//1つ目：tex特殊文字リスト
+app.get("/tex", (req, res) => {
+  res.render("tex", {data: todo});
 });
 
 
@@ -472,13 +476,20 @@ app.get("/menu/:url/:number", (req, res) => {
   res.render("hama_menu_detail", {url: url, number: number, data: detail});
 });
 
-app.post("/menu/:url", (req, res) => {
-  const id = hama_menu.length + 1;
-  const url = req.body.url;
-  const tag = req.body.tag;
-  hama_menu.push({id: id, url: url, tag: tag});
-  console.log(hama_menu);
-  res.render("hama", {data: hama_menu});
+app.post("/menu/:url/create", (req, res) => {
+  const id = hama_next_id;
+  const name = req.body.name;
+  const price = req.body.price;
+  const suuryou = req.body.suuryou;
+  const omochikaeri = req.body.omochikaeri;
+  const url = req.params.url;
+  const list = hama_all_menu[url];
+  list.push({id: id, name: name, price: price, suuryou: suuryou, omochikaeri: omochikaeri});
+  hama_next_id += 1;
+  // console.log(hama_menu);
+  // res.render("hama", {data: hama_menu});
+  console.log( hama_all_menu );
+  res.redirect(`/menu/${url}`);
 });
 
 app.get("/hama/:url/create", (req, res) => {
@@ -504,18 +515,38 @@ app.get("/menu/:url/delete/:number", (req, res) => {
 });
 
 app.get("/menu/:url/edit/:number", (req, res) => {
+  const url = req.params.url;
   const number = req.params.number;
-  const detail = hama_all_menu[req.params.url][number];
-  res.render('hama_menu_edit', {id: number, data: detail} );
+  const list = hama_all_menu[url];
+
+  let detail = null;
+  for(let i=0; i<list.length; i++) {
+    if(list[i].id == number) {
+      detail = list[i];
+      break;
+    }
+  }
+
+  res.render('hama_menu_edit', {id: number, url: url, data: detail} );
 });
 
 app.post("/menu/:url/update/:number", (req, res) => {
   const url = req.params.url;
-  hama_all_menu[req.params.url][req.params.number].id = req.body.id;
-  hama_all_menu[req.params.url][req.params.number].name = req.body.name;
-  hama_all_menu[req.params.url][req.params.number].price = req.body.price;
-  hama_all_menu[req.params.url][req.params.number].suuryou = req.body.suuryou;
-  hama_all_menu[req.params.url][req.params.number].omochikaeri = req.body.omochikaeri;
+  const number = req.params.number;
+  const list = hama_all_menu[url];
+
+  let update = null;
+  for(let i=0; i<list.length; i++) {
+    if(list[i].id == number) {
+      update = i;
+      break;
+    }
+  }
+  list[update].id = req.body.id;
+  list[update].name = req.body.name;
+  list[update].price = req.body.price;
+  list[update].suuryou = req.body.suuryou;
+  list[update].omochikaeri = req.body.omochikaeri;
   console.log( hama_all_menu );
   res.redirect(`/menu/${url}`);
 });
@@ -555,14 +586,16 @@ app.post("/sumabura", (req, res) => {
 app.get("/sumabura/edit/:number", (req, res) => {
   const number = req.params.number;
   const detail = sumabura_data[ number ];
+
   res.render('sumabura_edit', {id: number, data: detail} );
 });
 
 app.post("/sumabura/update/:number", (req, res) => {
-  sumabura_data[req.params.number].id = req.body.id;
-  sumabura_data[req.params.number].name = req.body.name;
-  sumabura_data[req.params.number].series = req.body.series;
-  sumabura_data[req.params.number].nannido = req.body.nannido;
+  const number = req.params.number;
+  sumabura_data[number].id = req.body.id;
+  sumabura_data[number].name = req.body.name;
+  sumabura_data[number].series = req.body.series;
+  sumabura_data[number].nannido = req.body.nannido;
   console.log( sumabura_data );
   res.redirect('/sumabura' );
 });

@@ -6,7 +6,7 @@
 </head>
 <body>
   <h2><%= data.name %>の編集</h2>
-  <form action="/menu/<%= data.url %>/update/<%= data.id - 1 %>" method="POST">
+  <form action="/menu/<%= url %>/update/<%= data.id - 1 %>" method="POST">
     <table>
       <tr><th>項目</th><th>データ</th></tr>
       <tr><td>ID</td><td><input type="text" name="id" value="<%= data.id %>"></td></tr>
@@ -17,6 +17,6 @@
     </table>
     <input type="submit" values="登録">
   </form>
-  <a href="/menu/<%= data.url %>">メニュー一覧に戻る</a>
+  <a href="/menu/<%= url %>">メニュー一覧に戻る</a>
 </body>
 </html>
