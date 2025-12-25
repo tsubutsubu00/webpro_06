@@ -1,0 +1,23 @@
+<!Doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= data.name %></title>
+</head>
+<body>
+  <h2><%= data.name %>の編集</h2>
+  <form action="/tex/update/<%= id %>" method="POST">
+    <table>
+      <tr><th>項目</th><th>データ</th></tr>
+      <tr><td>ID</td><td><input type="text" name="id" value="<%= data.id %>"></td></tr>
+      <tr><td>記号</td><td><input type="text" name="symbol" value="<%= data.symbol %>"></td></tr>
+      <tr><td>名前</td><td><input type="text" name="name" value="<%= data.name %>"></td></tr>
+      <tr><td>コマンド</td><td><input type="text" name="command" value="<%= data.command %>"></td></tr>
+      <tr><td>ジャンル</td><td><input type="text" name="genre" value="<%= data.genre %>"></td></tr>
+      <tr><td>意味</td><td><input type="text" name="mean" value="<%= data.mean %>"></td></tr>
+    </table>
+    <input type="submit" values="登録">
+  </form>
+  <a href="/tex/">数学記号一覧に戻る</a>
+</body>
+</html>

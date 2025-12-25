@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>新しい数式記号</title>
+</head>
+<body>
+    <form action="/tex" method="POST">
+        <input type="text" name="symbol" required>
+        <label for="symbol">記号:</label><br>
+        <input type="text" name="name">
+        <label for="name">名前:</label><br>
+        <input type="text" name="command">
+        <label for="command">コマンド:</label><br>
+        <input type="text" name="genre">
+        <label for="genre">ジャンル:</label><br>
+        <input type="text" name="mean" required>
+        <label for="mean">意味:</label><br>
+        <input type="submit" values="登録">
+    </form>
+</body>
+</html>

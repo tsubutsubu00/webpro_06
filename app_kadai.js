@@ -4,6 +4,57 @@ app.set('view engine', 'ejs');
 app.use("/public", express.static(__dirname + "/public"));
 app.use(express.urlencoded({ extended: true }));
 
+let tex_data = [
+  {id:1, symbol:"=", name:"等号", command:"=", genre:"等号", mean:"等しいことを示す"},
+  {id:2, symbol:"≠", name:"不等号", command:"\\neq", genre:"等号", mean:"等しくないことを示す"},
+  {id:3, symbol:"∼", name:"近似（ニアリー）", command:"\\sim", genre:"等号", mean:"近似を示す"},
+  {id:4, symbol:"≃", name:"近似（ニアリーイコール）", command:"\\simeq", genre:"等号", mean:"近似を示す"},
+  {id:5, symbol:"≈", name:"近似（アプロクス）", command:"\\approx", genre:"等号", mean:"近似を示す"},
+  {id:6, symbol:"≒", name:"近似（フォーリング）", command:"\\fallingdotseq", genre:"等号", mean:"ほとんど等しいことを示す"},
+  {id:7, symbol:"≓", name:"近似（ライジング）", command:"\\risingdotseq", genre:"等号", mean:"おおよそ等しいことを示す"},
+  {id:8, symbol:"≡", name:"合同記号", command:"\\equiv", genre:"等号", mean:"合同"},
+  {id:9, symbol:">", name:"大なり", command:">", genre:"不等号", mean:"ある値が他の値よりも大きい"},
+  {id:10, symbol:"<", name:"小なり", command:"<", genre:"不等号", mean:"ある値が他の値よりも小さい"},
+  {id:11, symbol:"≥", name:"以上", command:"\\geq", genre:"不等号", mean:"ある値が他の値以上である"},
+  {id:12, symbol:"≧", name:"以上（二重）", command:"\\geqq", genre:"不等号", mean:"ある値が他の値以上である"},
+  {id:13, symbol:"≤", name:"以下", command:"\\leq", genre:"不等号", mean:"ある値が他の値以下である"},
+  {id:14, symbol:"≦", name:"以下（二重）", command:"\\leqq", genre:"不等号", mean:"ある値が他の値以下である"},
+  {id:15, symbol:"≫", name:"大なり", command:"\\gg", genre:"不等号", mean:"十分大きい"},
+  {id:16, symbol:"≪", name:"小なり", command:"\\ll", genre:"不等号", mean:"十分小さい"},
+  {id:17, symbol:"+", name:"和", command:"+", genre:"演算子", mean:"ある値に他の値を加える"},
+  {id:18, symbol:"-", name:"差", command:"-", genre:"演算子", mean:"ある値に他の値を減じる"},
+  {id:19, symbol:"×", name:"積", command:"\\times", genre:"演算子", mean:"ある値に他の値を掛ける"},
+  {id:20, symbol:"÷", name:"商", command:"\\div", genre:"演算子", mean:"ある値に他の値を割る"},
+  {id:21, symbol:"±", name:"プラスマイナス", command:"\\pm", genre:"演算子", mean:"ある値に他の値を加えたり減じたりする"},
+  {id:22, symbol:"∓", name:"マイナスプラス", command:"\\mp", genre:"演算子", mean:"ある値に他の値を減じたり加えたりする"},
+  {id:23, symbol:"⊕", name:"直和", command:"\\oplus", genre:"演算子", mean:"どちらか一方だけが真であるときに真，両方真または両方偽のときに偽となる"},
+  {id:24, symbol:"⊖", name:"丸付きマイナス", command:"\\ominus", genre:"演算子", mean:"電気回路における電子の流れや負の電荷の状態を示す"},
+  {id:25, symbol:"⊗", name:"テンソルせき", command:"\\otimes", genre:"演算子", mean:"ベクトルや行列などの特別な掛け算に用いる"},
+  {id:26, symbol:"⊘", name:"丸付きスラッシュ", command:"\\oslash", genre:"演算子", mean:"空集合の代用として使われる"},
+  {id:27, symbol:"∘", name:"度", command:"\\circ", genre:"演算子", mean:"度数法で角度を示す"},
+  {id:28, symbol:"⋅", name:"ドット", command:"\\cdot", genre:"演算子", mean:"掛け算や内積などに使われる"},
+  {id:29, symbol:"∙", name:"中点", command:"\\bullet", genre:"演算子", mean:"掛け算や内積などに使われる"},
+  {id:30, symbol:"⋉", name:"半直積", command:"\\ltimes", genre:"演算子", mean:"ある値が他の値以下である"},
+  {id:31, symbol:"⋊", name:"半直積", command:"\\rtimes", genre:"演算子", mean:"ある値が他の値以上である"},
+  {id:32, symbol:"∈", name:"ぞくする", command:"\\in", genre:"集合", mean:"左辺が右辺に属する"},
+  {id:33, symbol:"∋", name:"ふくむ", command:"\\ni", genre:"集合", mean:"右辺が左辺を含む"},
+  {id:34, symbol:"∉", name:"ぞくさない", command:"\\notin", genre:"集合", mean:"左辺が右辺に属さない"},
+  {id:35, symbol:"⊂", name:"ふくまれる", command:"\\subset", genre:"集合", mean:"左辺が右辺の真部分集合"},
+  {id:36, symbol:"⊃", name:"ふくむ", command:"\\supset", genre:"集合", mean:"右辺が左辺の真部分集合"},
+  {id:37, symbol:"⊆", name:"ふくまれる", command:"\\subseteq", genre:"集合", mean:"左辺が右辺の部分集合"},
+  {id:38, symbol:"⊇", name:"ふくむ", command:"\\supseteq", genre:"集合", mean:"右辺が左辺の部分集合"},
+  {id:39, symbol:"⊈", name:"ふくまれない", command:"\\nsubseteq", genre:"集合", mean:"左辺が右辺の部分集合でない"},
+  {id:40, symbol:"⊉", name:"ふくまない", command:"\\nsupseteq", genre:"集合", mean:"右辺が左辺の部分集合でない"},
+  {id:41, symbol:"⊊", name:"ふくまれる", command:"\\subsetneq", genre:"集合", mean:"左辺が右辺の真部分集合"},
+  {id:42, symbol:"⊋", name:"ふくむ", command:"\\supsetneq", genre:"集合", mean:"右辺が左辺の真部分集合"},
+  {id:43, symbol:"∩", name:"かつ", command:"\\cap", genre:"集合", mean:"左辺と右辺の共通部分"},
+  {id:44, symbol:"∪", name:"または", command:"\\cup", genre:"集合", mean:"左辺と右辺の和集合"},
+  {id:45, symbol:"∅", name:"空集合", command:"\\emptyset", genre:"集合", mean:"空集合"},
+  {id:46, symbol:"∞", name:"無限大", command:"\\infty", genre:"集合", mean:"無限大"}
+];
+
+let tex_next_id = tex_data.length + 1;
+
 let hama_menu = [
     {id:1, url: "limited_menu", tag:"期間限定"},
     {id:2, url: "nigiri", tag:"にぎり"},
@@ -446,9 +497,55 @@ let sumabura_next_id = sumabura_data.length + 1;
 
 //1つ目：tex特殊文字リスト
 app.get("/tex", (req, res) => {
-  res.render("tex", {data: todo});
+  res.render("tex", {data: tex_data});
 });
 
+app.get("/tex/create", (req, res) => {
+  res.redirect('/public/tex_new.html');
+});
+
+app.get("/tex/:number", (req, res) => {
+  const number = req.params.number;
+  const detail = tex_data[ number ];
+  res.render('tex_detail', {id: number, data: detail} );
+});
+
+app.get("/tex/delete/:number", (req, res) => {
+  tex_data.splice( req.params.number, 1 );
+  res.redirect('/tex' );
+});
+
+app.post("/tex", (req, res) => {
+  const id = tex_next_id;
+  const symbol = req.body.symbol;
+  const name = req.body.name;
+  const command = req.body.command;
+  const genre = req.body.genre;
+  const mean = req.body.mean;
+  tex_data.push( { id: id, symbol: symbol, name: name, command: command, genre: genre, mean: mean } );
+  tex_next_id += 1;
+  console.log( tex_data );
+  res.render('tex', {data: tex_data} );
+});
+
+app.get("/tex/edit/:number", (req, res) => {
+  const number = req.params.number;
+  const detail = tex_data[ number ];
+
+  res.render('tex_edit', {id: number, data: detail} );
+});
+
+app.post("/tex/update/:number", (req, res) => {
+  const number = req.params.number;
+  tex_data[number].id = req.body.id;
+  tex_data[number].symbol = req.body.symbol;
+  tex_data[number].name = req.body.name;
+  tex_data[number].command = req.body.command;
+  tex_data[number].genre = req.body.genre;
+  tex_data[number].mean = req.body.mean;
+  console.log( tex_data );
+  res.redirect('/tex' );
+});
 
 //2つ目：はま寿司メニュー一覧
 app.get("/menu", (req, res) => {

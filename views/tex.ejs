@@ -1,0 +1,21 @@
+<!Doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Latex数学記号</title>
+</head>
+<body>
+  <h2>texで使われる数学記号（等号，不等号，演算子，集合）</h2>
+  <table>
+    <tr><th>ID</th><th>symbol</th><th>name</th></tr>
+      <% let number = 0 %>
+      <% for( let row of data ) { %>
+        <tr><td><%= row.id %></td>
+        <td><%= row.symbol %></td>
+        <td><a href="/tex/<%= number %>"><%= row.name %></a></td>
+        <% number += 1 %>
+      <% } %>
+  </table>
+  <a href="/tex/create">追加</a>
+</body>
+</html>
