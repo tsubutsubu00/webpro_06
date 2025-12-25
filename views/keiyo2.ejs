@@ -12,7 +12,7 @@
       <% for( let row of data ) { %>
         <tr><td><%= row.id %></td>
         <td><%= row.code %></td>
-        <td><a href="/keiyo2/<%= number %>"><%= row.name %></a></td></tr>
+        <td><a href="/keiyo2/<%= row.id %>"><%= row.name %></a></td></tr>
         <% number += 1 %>
       <% } %>
   </table>

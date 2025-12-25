@@ -495,7 +495,7 @@ let sumabura_data = [
 
 let sumabura_next_id = sumabura_data.length + 1;
 
-//1つ目：tex特殊文字リスト
+//1つ目：tex数学文字リスト
 app.get("/tex", (req, res) => {
   res.render("tex", {data: tex_data});
 });
