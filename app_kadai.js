@@ -1,3 +1,4 @@
+"use strict";
 const express = require("express");
 const app = express();
 app.set('view engine', 'ejs');
@@ -52,8 +53,6 @@ let tex_data = [
   {id:45, symbol:"∅", name:"空集合", command:"\\emptyset", genre:"集合", mean:"空集合"},
   {id:46, symbol:"∞", name:"無限大", command:"\\infty", genre:"集合", mean:"無限大"}
 ];
-
-let tex_next_id = tex_data.length + 1;
 
 let hama_menu = [
     {id:1, url: "limited_menu", tag:"期間限定"},
@@ -399,8 +398,6 @@ const hama_all_menu = {
   "kids_menu": hama_kids,
 };
 
-let hama_next_id = hama_menu.length + 1;
-
 let sumabura_data = [
     {id:1, name:"マリオ", series:"スーパーマリオ", nannido:"★★★★☆"},
     {id:2, name:"ドンキーコング", series:"ドンキーコング", nannido:"★☆☆☆☆"},
@@ -493,8 +490,6 @@ let sumabura_data = [
     {id:89, name:"ソラ", series:"KINGDOM HEARTS",nannido:"★★★☆☆"},
 ];
 
-let sumabura_next_id = sumabura_data.length + 1;
-
 //1つ目：tex数学文字リスト
 app.get("/tex", (req, res) => {
   res.render("tex", {data: tex_data});
@@ -516,14 +511,14 @@ app.get("/tex/delete/:number", (req, res) => {
 });
 
 app.post("/tex", (req, res) => {
-  const id = tex_next_id;
   const symbol = req.body.symbol;
   const name = req.body.name;
   const command = req.body.command;
   const genre = req.body.genre;
   const mean = req.body.mean;
-  tex_data.push( { id: id, symbol: symbol, name: name, command: command, genre: genre, mean: mean } );
-  tex_next_id += 1;
+  let new_id = 1;
+  new_id = tex_data[tex_data.length - 1].id + 1;
+  tex_data.push( { id: new_id, symbol: symbol, name: name, command: command, genre: genre, mean: mean } );
   console.log( tex_data );
   res.render('tex', {data: tex_data} );
 });
@@ -531,7 +526,6 @@ app.post("/tex", (req, res) => {
 app.get("/tex/edit/:number", (req, res) => {
   const number = req.params.number;
   const detail = tex_data[ number ];
-
   res.render('tex_edit', {id: number, data: detail} );
 });
 
@@ -552,102 +546,72 @@ app.get("/menu", (req, res) => {
   res.render("hama", {data: hama_menu});
 });
 
-app.get("/menu/:url", (req, res) => {
+app.get("/menu/:url/create", (req, res) => {
   const url = req.params.url;
-  const menu_list = hama_all_menu[ url ];
-  res.render("hama_menu", { url: url, data: menu_list});
+  // res.redirect("/public/hama_new.html");
+  res.sendFile( __dirname + "/public/hama_new.html" );
 });
 
-app.get("/menu/:url/:number", (req, res) => {
+app.get("/menu/:url", (req, res) => {
   const url = req.params.url;
-  const number = req.params.number;
-  const list = hama_all_menu[url];
-
-  let detail = null;
-  for(let i=0; i<list.length; i++) {
-    if(list[i].id == number) {
-      detail = list[i];
-      break;
-    }
-  }
-  res.render("hama_menu_detail", {url: url, number: number, data: detail});
+  const menu_menu_list = hama_all_menu[ url ];
+  res.render("hama_menu", { url: url, data: menu_menu_list});
 });
 
 app.post("/menu/:url/create", (req, res) => {
-  const id = hama_next_id;
   const name = req.body.name;
   const price = req.body.price;
   const suuryou = req.body.suuryou;
   const omochikaeri = req.body.omochikaeri;
   const url = req.params.url;
-  const list = hama_all_menu[url];
-  list.push({id: id, name: name, price: price, suuryou: suuryou, omochikaeri: omochikaeri});
-  hama_next_id += 1;
-  // console.log(hama_menu);
-  // res.render("hama", {data: hama_menu});
+  const menu_list = hama_all_menu[url];
+
+  let new_id = 1;
+  new_id = menu_list[menu_list.length - 1].id + 1;
+  menu_list.push({id: new_id, name: name, price: price, suuryou: suuryou, omochikaeri: omochikaeri});
+
   console.log( hama_all_menu );
   res.redirect(`/menu/${url}`);
 });
 
-app.get("/hama/:url/create", (req, res) => {
-  const url = req.params.url;
-  res.redirect('/public/hama_new.html');
-});
-
-app.get("/menu/:url/delete/:number", (req, res) => {
+app.get("/menu/:url/:number", (req, res) => {
   const url = req.params.url;
   const number = req.params.number;
-  const list = hama_all_menu[url];
-
-  let sakujo = null;
-  for(let i=0; i<list.length; i++) {
-    if(list[i].id == number) {
-      sakujo = i;
-      break;
-    }
-  }
-
-  list.splice(sakujo, 1);
-  res.redirect(`/menu/${url}`);
+  const menu_list = hama_all_menu[url];
+  const detail = menu_list.find(item => item.id == number);
+  res.render("hama_menu_detail", {url: url, number: number, data: detail});
 });
 
 app.get("/menu/:url/edit/:number", (req, res) => {
   const url = req.params.url;
   const number = req.params.number;
-  const list = hama_all_menu[url];
-
-  let detail = null;
-  for(let i=0; i<list.length; i++) {
-    if(list[i].id == number) {
-      detail = list[i];
-      break;
-    }
-  }
-
+  const menu_list = hama_all_menu[url];
+  const detail = menu_list.find(item => item.id == number);
   res.render('hama_menu_edit', {id: number, url: url, data: detail} );
 });
 
 app.post("/menu/:url/update/:number", (req, res) => {
   const url = req.params.url;
   const number = req.params.number;
-  const list = hama_all_menu[url];
-
-  let update = null;
-  for(let i=0; i<list.length; i++) {
-    if(list[i].id == number) {
-      update = i;
-      break;
-    }
-  }
-  list[update].id = req.body.id;
-  list[update].name = req.body.name;
-  list[update].price = req.body.price;
-  list[update].suuryou = req.body.suuryou;
-  list[update].omochikaeri = req.body.omochikaeri;
+  const menu_list = hama_all_menu[url];
+  const update = menu_list.find(item => item.id == number);
+  update.id = req.body.id;
+  update.name = req.body.name;
+  update.price = req.body.price;
+  update.suuryou = req.body.suuryou;
+  update.omochikaeri = req.body.omochikaeri;
   console.log( hama_all_menu );
   res.redirect(`/menu/${url}`);
 });
 
+app.get("/menu/:url/delete/:number", (req, res) => {
+  const url = req.params.url;
+  const number = req.params.number;
+  const menu_list = hama_all_menu[url];
+  const sakujo = menu_list.find(item => item.id == number);
+  menu_list.splice(sakujo, 1);
+  res.redirect(`/menu/${url}`);
+});
 
 //3つ目：スマブラ
 app.get("/sumabura", (req, res) => {
@@ -670,12 +634,12 @@ app.get("/sumabura/delete/:number", (req, res) => {
 });
 
 app.post("/sumabura", (req, res) => {
-  const id = sumabura_next_id;
   const name = req.body.name;
   const series = req.body.series;
   const nannido = req.body.nannido;
-  sumabura_data.push( { id: id, name: name, series: series, nannido: nannido } );
-  sumabura_next_id += 1;
+  let new_id = 1;
+  new_id = sumabura_data[sumabura_data.length - 1].id + 1;
+  sumabura_data.push( { id: new_id, name: name, series: series, nannido: nannido } );
   console.log( sumabura_data );
   res.render('sumabura', {data: sumabura_data} );
 });
