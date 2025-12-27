@@ -46,6 +46,11 @@
 本webアプリケーションは，現在はま寿司で取り扱っているメニューを効率的に管理・閲覧するためのシステムである．
 このあと紹介する2つ目，3つ目と異なり，データ量が多いため，情報をカテゴリごとに分類し，その後メニュー一覧に
 飛ぶようにしている点が特徴である．また，メニュー一覧にそれぞれ追加，編集，削除が行える機能を追加した．
+変更点として，本システムはパスパラメータの数値を直接参照するのではなく，各データが持つ固有の\texttt{id}
+を\texttt{find}メソッドを使って検索し，合致するオブジェクトを特定するロジックに変更した．
+このようなロジックに変更した理由として，はま寿司のシステムは，メニューの追加や削除が頻繁に行われる可能性が高いという
+観点から不適切であると判断したためである．具体的には，メニューを削除をした後に追加を行うと，
+それ以降のデータの順番がずれてしまうが，データに紐づいているIDは変化しないためである．
 
 \subsubsection{データ構造}
 はま寿司カテゴリ一覧のデータ構造を表\ref{hyou:hama_data_kouzou_kategori}に，
@@ -61,7 +66,7 @@
 \begin{table}[H]
 \centering
 \caption{はま寿司カテゴリ一覧のデータ構造}
-\begin{tabular}{c|c|c|c}
+\begin{tabularx}{\textwidth}{c|c|X|c}
     \hline
     項目名 & データ型 & 説明 & 出力例 \\
     \hline\hline
@@ -71,14 +76,14 @@
     \hline
     tag & string & カテゴリの名称 & 期間限定，にぎりなど \\
     \hline
-\end{tabular}
+\end{tabularx}
 \label{hyou:hama_data_kouzou_kategori}
 \end{table}
 
 \begin{table}[H]
 \centering
 \caption{はま寿司メニュー一覧のデータ構造}
-\begin{tabular}{c|c|c|c}
+\begin{tabularx}{\textwidth}{c|c|X|c}
     \hline
     項目名 & データ型 & 説明 & 出力例 \\
     \hline\hline
@@ -92,7 +97,7 @@
     \hline
     omochikaeri & string & そのメニューがお持ち帰りできるかの可否 & お持ち帰り可など \\
     \hline
-\end{tabular}
+\end{tabularx}
 \label{hyou:hama_data_kouzou_menu}
 \end{table}
 
@@ -110,7 +115,7 @@
 \begin{table}[H]
 \centering
 \caption{はま寿司メニュー一覧のページ遷移}
-\begin{tabular}{c|c|c|c}
+\begin{tabularx}{\textwidth}{c|X|c|X}
     \hline
     目的 & リソース名 & HTTPメソッド & 遷移先 \\
     \hline\hline
@@ -130,7 +135,7 @@
     \hline
     削除 & /menu/:url/delete/:number & GET & /menu/:url （メニュー一覧に戻る） \\
     \hline
-\end{tabular}
+\end{tabularx}
 \label{hyou:hama_page_senni}
 \end{table}
 
@@ -151,11 +156,7 @@
 表示する役割を持っている．ユーザーが選んだメニューを押すと，詳細表示へと遷移する．
 \texttt{/menu/:url/:number}の詳細表示を行うリソースでは，\texttt{:number}を固有のIDとして扱う．
 \texttt{find}メソッドを用いて，\texttt{item.id == number}により検索をかけることで，
-配列の順序に依存しないようなデータ抽出を行うことができる．このようなロジックを使った理由として，
-他のwebアプリケーションで使用しているURLの数字を配列を使って何番目に入れるかのロジックは
-シンプルな構造であるが，はま寿司のシステムは，メニューの追加や削除が頻繁に行われる可能性が高いという
-観点から不適切であると判断したためである．具体的には，メニューを削除をした後に追加を行うと，
-それ以降のデータの順番がずれてしまうが，データに紐づいているIDは変化しないためである．
+配列の順序に依存しないようなデータ抽出を行うことができる．
 \texttt{/menu/:url/create}の新規追加を行うリソースでは，\texttt{res.sendFile}を用いて，
 \texttt{hama\_new.html}を読み込む．フォーム送信時には，既存の最終データのIDに1を加算する
 \texttt{new\_id}を生成し，新しく作成したデータを配列の末尾に\texttt{push}により
@@ -186,7 +187,7 @@ string型で定義されている．特に，\texttt{id}の数値を活用して
 \begin{table}[H]
 \centering
 \caption{tex数学記号一覧のデータ構造}
-\begin{tabular}{c|c|c|c}
+\begin{tabularx}{\textwidth}{c|c|X|X}
     \hline
     項目名 & データ型 & 説明 & 出力例 \\
     \hline\hline
@@ -202,7 +203,7 @@ string型で定義されている．特に，\texttt{id}の数値を活用して
     \hline
     mean & string & 数学記号の持つ意味 & 等しいことを示す，等しくないことを示す，など \\
     \hline
-\end{tabular}
+\end{tabularx}
 \label{hyou:tex_data_kouzou}
 \end{table}
     
@@ -221,7 +222,7 @@ CRUDの要素である追加，編集，削除を行うと，遷移先として�
 \begin{table}[H]
 \centering
 \caption{tex数式記号一覧のページ遷移}
-\begin{tabular}{c|c|c|c}
+\begin{tabularx}{\textwidth}{c|X|c|X}
     \hline
     目的 & リソース名 & HTTPメソッド & 遷移先 \\
     \hline\hline
@@ -239,7 +240,7 @@ CRUDの要素である追加，編集，削除を行うと，遷移先として�
     \hline
     削除 & /tex/delete/:number & GET/POST & /tex （一覧表示に戻る） \\
     \hline
-\end{tabular}
+\end{tabularx}
 \label{hyou:tex_page_senni}
 \end{table}
 
@@ -290,7 +291,7 @@ CRUDの要素である追加，編集，削除を行うと，遷移先として�
 \begin{table}[H]
 \centering
 \caption{スマブラファイター一覧のデータ構造}
-\begin{tabular}{c|c|c|c}
+\begin{tabularx}{\textwidth}{c|c|X|X}
     \hline
     項目名 & データ型 & 説明 & 出力例 \\
     \hline\hline
@@ -302,7 +303,7 @@ CRUDの要素である追加，編集，削除を行うと，遷移先として�
     \hline
     nannido & string & プレイヤーの上位5\%であるVIPに到達する難易度 & ★★★★☆など \\
     \hline
-\end{tabular}
+\end{tabularx}
 \label{hyou:sumabura_data_kouzou}
 \end{table}
 
@@ -319,7 +320,7 @@ CRUDの要素である追加，編集，削除を行うと，遷移先として�
 \begin{table}[H]
 \centering
 \caption{スマブラファイター一覧のページ遷移}
-\begin{tabular}{c|c|c|c}
+\begin{tabularx}{\textwidth}{c|X|c|X}
     \hline
     目的 & リソース名 & HTTPメソッド & 遷移先 \\
     \hline\hline
@@ -335,9 +336,9 @@ CRUDの要素である追加，編集，削除を行うと，遷移先として�
     \hline
     更新 & /sumabura/update/:number & POST & /sumabura （一覧表示に戻る） \\
     \hline
-    削除 & /sumabura/delete/:number & GET/POST & /sumabura （一覧表示に戻る） \\
+    削除 & /sumabura/delete/:number & GET & /sumabura （一覧表示に戻る） \\
     \hline
-\end{tabular}
+\end{tabularx}
 \label{hyou:sumabura_page_senni}
 \end{table}
 
@@ -434,19 +435,82 @@ Ctrl + C
 \subsection{基本的な操作の流れ}
 %使用できる機能をかく
 %データの閲覧・追加・編集・削除ができることを簡潔に示す
+ユーザーは主に4つの操作を直感的に行うことができる．
+その4つの操作とは，閲覧，追加，編集，削除のことである．
+閲覧機能では，カテゴリを選び，メニューの詳細情報を確認することができる．
+追加機能では，新しいメニューをメニュー一覧に追加する．
+編集機能では，既存のメニュー名や価格，お持ち帰りの可否などの要素を編集する．
+削除機能では，提供終了したメニューなどを削除したい場合に用いる．
 
 \subsection{操作手順の詳細}
 %このセクションはスクリーンショットを活用する
 \subsubsection{システムの起動}
 %起動画面
+サーバーを管理している管理者がサーバーを起動したあと，利用者は，WebブラウザのURL欄に
+\texttt{https//localhost:8080/menu}と入力することで，システムを起動することができる．
+
 \subsubsection{データの閲覧方法}
 %一覧表示・詳細表示
+システムを起動すると，まず図\ref{fig:kategori}のようなカテゴリ一覧が表示される．
+その後，「期間限定」や「にぎり」などの見たい項目を選択すると，図\ref{fig:menu}のような
+メニュー一覧が表示される．さらに，特定のメニュー名をクリックすることで，図\ref{fig:shousai}のような
+価格やお持ち帰りの可否などの情報がのっている詳細画面を見ることができる．
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{figs/kategori.png}
+\caption{はま寿司のカテゴリ一覧}
+\label{fig:kategori}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{figs/menu.png}
+\caption{はま寿司のメニュー一覧}
+\label{fig:menu}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{figs/shousai.png}
+\caption{はま寿司のメニュー詳細一覧}
+\label{fig:shousai}
+\end{figure}
+
 \subsubsection{新しくデータを登録する方法}
 %データ追加
+メニュー一覧の画面下部にある追加ボタンをクリックすると，図\ref{fig:tsuika}のような
+入力画面が表示される．すべての項目を入力し，登録ボタンをクリックすることで
+新しいメニューが一覧に追加される．
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{figs/tsuika.png}
+\caption{はま寿司のメニュー追加の方法}
+\label{fig:tsuika}
+\end{figure}
+
 \subsubsection{既存データの修正方法}
 %データ編集
+メニューの詳細画面にある編集ボタンをクリックすると，図\ref{fig:henshuu}のような
+編集画面が表示される．内容を書き換えたあとに，送信ボタンを押すことで内容が上書きされる．
+\begin{figure}[H]
+\centering
+\includegraphics[width=6cm]{figs/henshuu.png}
+\caption{はま寿司のメニュー編集の方法}
+\label{fig:henshuu}
+\end{figure}
+
 \subsubsection{データの削除方法}
 %データ削除
+メニュー画面の詳細画面にある削除ボタンをクリックすると，図\ref{fig:sakujo}のように
+確認のメッセージが表示される．OKを選択するとその対象のデータは削除される．
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{figs/sakujo.png}
+\caption{はま寿司のメニュー削除の方法}
+\label{fig:sakujo}
+\end{figure}
+
 \end{document}
 
 %開発者→概要のセクションにどの部分を変更したかと変更理由記述する

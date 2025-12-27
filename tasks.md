@@ -13,17 +13,17 @@
   - [x] HTTPメソッドとリソース名一覧 :writing_hand:
   - [x] データ構造 :writing_hand:
   - [x] リソース名ごとの機能の詳細 :writing_hand:
-- [ ] 管理者向けドキュメントの構成
+- [x] 管理者向けドキュメントの構成
   - [x] インストールから起動までの手順確認 :computer:
-  - [ ] インストール方法 :writing_hand:
-  - [ ] 起動方法 :writing_hand:
-  - [ ] 起動できない場合 :writing_hand:
-  - [ ] 終了方法 :writing_hand:
-  - [ ] 分かっている不具合 :writing_hand:
+  - [x] インストール方法 :writing_hand:
+  - [x] 起動方法 :writing_hand:
+  - [x] 起動できない場合 :writing_hand:
+  - [x] 終了方法 :writing_hand:
+  - [x] 分かっている不具合 :writing_hand:
 - [ ] 利用者向けドキュメントの作業
   - [x] 構成の検討 :thinking:
   - [ ] スクリーンショットの保存と整理 :computer:
-  - [ ] 概要 :writing_hand:
+  - [x] 概要 :writing_hand:
   - [ ] 使用できる機能 :writing_hand:
   - [ ] 起動画面 :writing_hand:
   - [ ] 一覧表示 :writing_hand:
