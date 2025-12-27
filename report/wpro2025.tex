@@ -1,30 +1,452 @@
-\documentclass[uplatex,dvipdfmx]{jsarticle}
+\documentclass[uplatex,dvipdfmx]{jlreq} % 日本語用の標準クラス
+\usepackage[fleqn,tbtags]{mathtools}    % 数式の左寄せ・配置調整
+\usepackage{jlreq-deluxe}               % 多書体（太字等）の利用
+\usepackage[noalphabet]{pxchfon}        % 日本語フォントの埋め込み
+\usepackage{stix2}                      % 欧文書体と数式の指定
+% \usepackage{hira-stix}                % ヒラギノとSTIXの併用
 
-\usepackage[uplatex,deluxe]{otf} % UTF
-\usepackage[noalphabet]{pxchfon} % must be after otf package
-\usepackage{stix2} %欧文＆数式フォント
-\usepackage[fleqn,tbtags]{mathtools} % 数式関連 (w/ amsmath)
-\usepackage{hira-stix} % ヒラギノフォント＆STIX2 フォント代替定義（Warning回避）
 \usepackage{url}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage{bmpsize}
 \usepackage{float}
+\usepackage{natbib}
+\usepackage{listings}
+\usepackage{ascmac}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tabularx}
+
+\lstset{
+  basicstyle=\ttfamily\small, % フォントとサイズ
+  breaklines=true,            % 行を折り返す
+  columns=fullflexible,       % 幅に合わせて調整
+  frame=single,               % フレームを付ける
+  backgroundcolor=\color{lightgray!10}, % 背景色
+  keywordstyle=\color{blue}\bfseries, % キーワードの色と太字
+  commentstyle=\color{green!50!black}, % コメントの色
+  stringstyle=\color{red},    % 文字列の色
+  numbers=left,               % 行番号を左に表示
+  numberstyle=\tiny\color{gray}, % 行番号のスタイル
+  showstringspaces=false,     % 文字列中のスペースを表示しない
+  tabsize=2,                  % タブサイズ
+  captionpos=b,               % キャプションの位置 (b=bottom)
+  language=JavaScript,        % 言語設定
+}
 
 \begin{document}
 \title{Webプログラミング　レポート課題}
 \author{25G1087 粒良梁雅}
 \maketitle
 
-\section{利用者向けマニュアル}
+\section{githubのリポジトリのURL}
+\url{https://github.com/tsubutsubu00/webpro_06.git}
+\section{開発者向けマニュアル}
+\subsection{1つ目:はま寿司メニュー一覧}
+\subsubsection{概要}
+本webアプリケーションは，現在はま寿司で取り扱っているメニューを効率的に管理・閲覧するためのシステムである．
+このあと紹介する2つ目，3つ目と異なり，データ量が多いため，情報をカテゴリごとに分類し，その後メニュー一覧に
+飛ぶようにしている点が特徴である．また，メニュー一覧にそれぞれ追加，編集，削除が行える機能を追加した．
+
+\subsubsection{データ構造}
+はま寿司カテゴリ一覧のデータ構造を表\ref{hyou:hama_data_kouzou_kategori}に，
+はま寿司メニュー一覧のデータ構造を表\ref{hyou:hama_data_kouzou_menu}に示す．
+本webアプリケーションでは，すべてのメニューデータを\texttt{hama\_all\_menu}
+に格納している．この\texttt{hama\_all\_menu}は，カテゴリ名である\texttt{limited\_menu}
+や\texttt{nigiri}などを持っているオブジェクトであり，値として各メニューの配列を保持する多階層構造
+となっている．このような設計になっているため，サーバー側で\texttt{req.params.url}を変数として利用して，
+動的にデータを切り替えて取得することが可能である．
+また，項目内の\texttt{id}は，number型で定義している．この\texttt{id}を活用して，詳細表示や編集，削除
+を行う際に特定のデータを識別するためのパスパラメータとして利用している．
+
+\begin{table}[H]
+\centering
+\caption{はま寿司カテゴリ一覧のデータ構造}
+\begin{tabular}{c|c|c|c}
+    \hline
+    項目名 & データ型 & 説明 & 出力例 \\
+    \hline\hline
+    id & number & 各カテゴリに割り当てたID & 0,1,2など \\
+    \hline
+    url & string & パラメータ名 & limited\_menu.nigiriなど \\
+    \hline
+    tag & string & カテゴリの名称 & 期間限定，にぎりなど \\
+    \hline
+\end{tabular}
+\label{hyou:hama_data_kouzou_kategori}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{はま寿司メニュー一覧のデータ構造}
+\begin{tabular}{c|c|c|c}
+    \hline
+    項目名 & データ型 & 説明 & 出力例 \\
+    \hline\hline
+    id & number & 各メニューに割り当てたID & 0,1,2など \\
+    \hline
+    name & string & メニューの名称 & 厳選まぐろ中とろなど \\
+    \hline
+    price & string & メニューの価格 & 110円（税込），176円（税込）など \\
+    \hline
+    suuryou & string & メニューの数量 & 1貫，2貫など \\
+    \hline
+    omochikaeri & string & そのメニューがお持ち帰りできるかの可否 & お持ち帰り可など \\
+    \hline
+\end{tabular}
+\label{hyou:hama_data_kouzou_menu}
+\end{table}
+
+\subsubsection{ページ遷移}
+%このページ遷移の中にHTTPメソッドとリソース名を入れる
+%ページ遷移図も
+\label{page_senni:hama}
+本webアプリケーションがどのようにページ遷移をするかを表\ref{hyou:hama_page_senni}に，
+それらを簡潔にまとめた図を図\ref{sennizu:hama}に示す．
+本webアプリケーションでは，まず\texttt{/menu}にてカテゴリ一覧を表示し，カテゴリ選択をすると
+指定されたメニュー一覧\texttt{/menu/:url}にページ遷移する仕様となっている．
+また，本システムは追加，編集，削除のCRUD操作にも対応しており，それらの操作を行うと，ユーザーが指定していた
+カテゴリのメニュー一覧へとリダイレクト処理が行われる設計となっている．
+
+\begin{table}[H]
+\centering
+\caption{はま寿司メニュー一覧のページ遷移}
+\begin{tabular}{c|c|c|c}
+    \hline
+    目的 & リソース名 & HTTPメソッド & 遷移先 \\
+    \hline\hline
+    カテゴリ一覧 & /menu & GET & hama.ejs \\
+    \hline
+    メニュー一覧 & /menu/:url & GET & hama\_menu.ejs \\
+    \hline
+    追加フォーム & /menu/:url/create & GET & /public/hama\_menu\_new.html \\
+    \hline
+    新規追加 & /menu/:url/create & POST & /menu/:url （メニュー一覧に戻る） \\
+    \hline
+    詳細表示 & /menu/:url/:number & GET & hama\_menu\_detail.ejs \\
+    \hline
+    編集 & /menu/:url/edit/:number & GET & hama\_menu\_edit.ejs \\
+    \hline
+    更新 & /menu/:url/update/:number & POST & /menu/:url （メニュー一覧に戻る） \\
+    \hline
+    削除 & /menu/:url/delete/:number & GET & /menu/:url （メニュー一覧に戻る） \\
+    \hline
+\end{tabular}
+\label{hyou:hama_page_senni}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{figs/hama_flow.png}
+\caption{はま寿司メニュー一覧のページ遷移図}
+\label{sennizu:hama}
+\end{figure}
+
+\subsubsection{リソースごとの機能の詳細}
+第\ref{page_senni:hama}節で作成した表を基に，リソースごとの機能の詳細について説明する．
+\texttt{/menu}のカテゴリを一覧表示するリソースでは，すべてのカテゴリ情報を持つ\texttt{hama\_menu}
+を\texttt{hama.ejs}に渡し，ユーザーに見たいページの選択を提示する役割を持つ．ユーザーに選択された
+カテゴリは，その後，メニュー一覧へと遷移する．
+\texttt{/menu/:url}のメニューを一覧表示するリソースでは，パスパラメータ\texttt{url}
+をキーとして利用し，連想配列である\texttt{hama\_all\_menu}から該当するカテゴリの配列を動的に抽出した後に，
+表示する役割を持っている．ユーザーが選んだメニューを押すと，詳細表示へと遷移する．
+\texttt{/menu/:url/:number}の詳細表示を行うリソースでは，\texttt{:number}を固有のIDとして扱う．
+\texttt{find}メソッドを用いて，\texttt{item.id == number}により検索をかけることで，
+配列の順序に依存しないようなデータ抽出を行うことができる．このようなロジックを使った理由として，
+他のwebアプリケーションで使用しているURLの数字を配列を使って何番目に入れるかのロジックは
+シンプルな構造であるが，はま寿司のシステムは，メニューの追加や削除が頻繁に行われる可能性が高いという
+観点から不適切であると判断したためである．具体的には，メニューを削除をした後に追加を行うと，
+それ以降のデータの順番がずれてしまうが，データに紐づいているIDは変化しないためである．
+\texttt{/menu/:url/create}の新規追加を行うリソースでは，\texttt{res.sendFile}を用いて，
+\texttt{hama\_new.html}を読み込む．フォーム送信時には，既存の最終データのIDに1を加算する
+\texttt{new\_id}を生成し，新しく作成したデータを配列の末尾に\texttt{push}により
+追加する役割を持っている．
+\texttt{/menu/:url/edit/:number}の編集を行うリソースでは，詳細表示でも利用した
+\texttt{find}メソッドで特定したオブジェクトの各要素を，編集画面で表示し編集する役割を持っている．
+\texttt{/menu/:url/update/:number}の更新を行うリソースでは，詳細表示や編集と同様
+\texttt{find}メソッドで特定したオブジェクトの各要素を，フォームから送信されたデータで直接上書き
+する機能を持っている．
+\texttt{/menu/:url/delete/:number}の削除を行うリソースでは，\texttt{:number}によって
+パスパラメータで指定された\texttt{ID}と合致するデータを\texttt{find}メソッドにより特定した後，
+\texttt{splice}メソッドによって配列から削除する役割を持っている．また，誤って削除ボタンを押した際に
+\texttt{onclick="return confirm()}を導入することで，誤って削除することを防ぐ利用者への配慮も行った．
+
+\subsection{2つ目:tex数学記号一覧}
+\subsubsection{概要}
+本webアプリケーションは，LaTexで使用される数学記号を一覧表示するシステムである．
+閲覧するだけでなく，数学記号をブラウザ上で追加・編集・削除のできる機能を備えている．
+
+\subsubsection{データ構造}
+\label{data_kouzou:tex}
+tex数学記号一覧のデータ構造を表\ref{hyou:tex_data_kouzou}に示す．
+項目名に示しているこれらのデータは，すべて\texttt{tex\_data}に格納している．
+\texttt{id}は，number型で定義しており，それ以外の要素は，文字列として出力するために，
+string型で定義されている．特に，\texttt{id}の数値を活用して，詳細表示や編集，削除を行う際に
+特定のデータを識別するためのパスパラメータとして利用している．
+
+\begin{table}[H]
+\centering
+\caption{tex数学記号一覧のデータ構造}
+\begin{tabular}{c|c|c|c}
+    \hline
+    項目名 & データ型 & 説明 & 出力例 \\
+    \hline\hline
+    id & number & 数学記号に割り当てたID & 0,1,2など \\
+    \hline
+    symbol & string & texで出力される数学記号 & =，≠など \\
+    \hline
+    name & string & 数学記号の名称 & 等号，不等号など \\
+    \hline
+    command & string & texで使うコマンド & =，\textbackslash{}neqなど \\
+    \hline
+    genre & string & 数学記号のジャンル & 等号，不等号，演算子など \\
+    \hline
+    mean & string & 数学記号の持つ意味 & 等しいことを示す，等しくないことを示す，など \\
+    \hline
+\end{tabular}
+\label{hyou:tex_data_kouzou}
+\end{table}
+    
+\subsubsection{ページ遷移}
+%このページ遷移の中にHTTPメソッドとリソース名を入れる
+%ページ遷移図も
+\label{page_senni:tex}
+
+本webアプリケーションがどのようにページ遷移をするかを表\ref{hyou:tex_page_senni}に，
+それらを簡潔にまとめた図を図\ref{sennizu:tex}に示す．
+本システムのトップページは，\texttt{\textbackslash{}tex}で，「一覧表示」の役割を担っている．
+CRUDの要素である追加，編集，削除を行うと，遷移先としてトップページである\texttt{\textbackslash{}tex}
+にリダイレクト処理によって戻るような設計となっている．このCRUDによって，ユーザーインターフェース
+向上につなげている．
+
+\begin{table}[H]
+\centering
+\caption{tex数式記号一覧のページ遷移}
+\begin{tabular}{c|c|c|c}
+    \hline
+    目的 & リソース名 & HTTPメソッド & 遷移先 \\
+    \hline\hline
+    一覧表示 & /tex & GET & tex.ejs \\
+    \hline
+    追加フォーム & /tex/create & GET & /public/tex\_new.html \\
+    \hline
+    詳細表示 & /tex/:number & GET & tex\_detail.ejs \\
+    \hline
+    追加 & /tex & POST & /tex （一覧表示に戻る） \\
+    \hline
+    編集 & /tex/edit/:number & GET & tex\_edit.ejs \\
+    \hline
+    更新 & /tex/update/:number & POST & /tex （一覧表示に戻る） \\
+    \hline
+    削除 & /tex/delete/:number & GET/POST & /tex （一覧表示に戻る） \\
+    \hline
+\end{tabular}
+\label{hyou:tex_page_senni}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{figs/tex_flow.png}
+\caption{tex数式記号一覧のページ遷移図}
+\label{sennizu:tex}
+\end{figure}
+
+\subsubsection{リソースごとの機能の詳細}
+第\ref{page_senni:tex}節で作成した表を参考に，リソースごとの各機能について説明する．
+一覧表示することが目的である\texttt{/tex}のリソースでは，配列\texttt{tex\_data}の中に
+格納されているデータをすべて取得し，\texttt{tex.ejs}に渡して表形式で表示する役割を持っている．
+その\texttt{/tex}に表示されるデータはURLとして\texttt{/tex/:number}の詳細表示のリンクへ
+とべるようになっている．
+\texttt{/tex/:number}のリソースでは，URLから取得したパスパラメータ\texttt{:number}
+を配列の番号として割り当て，\texttt{tex\_data[number]}によって特定のデータを抽出して
+\texttt{tex\_detail.ejs}を使って表示する役割を持っている．
+\texttt{/tex/create}や\texttt{/tex}の追加処理を行うリソースでは，追加ボタンを押すと，
+\texttt{/tex/create}にアクセスし，\texttt{tex\_new.html}にリダイレクトし，入力画面を表示する．
+フォーム送信時には，既存の最終データのIDに1を加算する\texttt{new\_id}を生成し，新しく作成した
+データを配列の末尾に\texttt{push}により追加する役割を持っている．
+\texttt{/tex/edit/:number}の編集を行うリソースでは，\texttt{tex\_data[number]}から
+現在の値を読み込み，それを編集画面で表示する役割を持っている．
+\texttt{/tex/update/:number}の更新を行うリソースでは，送信されたデータで配列の該当する部分
+\texttt{tex\_data[number]}の各要素を直接上書きする機能を持っている．
+\texttt{/tex/delete/:number}の削除を行うリソースでは，パスパラメータで指定した場所を
+\texttt{splice}というコードの第1引数に渡し，配列から該当する要素を1件削除する．削除
+を行ったあとは，tex数学記号一覧のページである\texttt{/tex}にリダイレクトする．
+また，誤って削除ボタンを押した際に\texttt{onclick="return confirm()}を導入することで，
+誤って削除することを防ぐ利用者への配慮も行った．
+
+\subsection{3つ目:大乱闘スマッシュブラザーズファイター一覧}
+\subsubsection{概要}
+本webアプリケーションは，nintendo Switch用ゲームソフト
+「大乱闘スマッシュブラザーズ」（以降，スマブラ）に登場するファイター（キャラクター）
+全員を一覧表示するシステムである．一覧表示だけでなく，ファイター
+の追加や編集，削除を行うことができる．
+
+\subsubsection{データ構造}
+スマブラファイター一覧のデータ構造を表\ref{hyou:sumabura_data_kouzou}に示す．
+項目名として示しているデータは，すべて\texttt{sumabura\_data}に格納している．
+第\ref{data_kouzou:tex}節と同様に，\texttt{id}は，number型で定義しており，
+それ以外の要素は，文字列として出力するために，string型で定義している．特に，\texttt{id}
+の数値を活用して，詳細表示や編集，削除を行う際に特定のデータを識別するためのパスパラメータとして利用している．
+
+\begin{table}[H]
+\centering
+\caption{スマブラファイター一覧のデータ構造}
+\begin{tabular}{c|c|c|c}
+    \hline
+    項目名 & データ型 & 説明 & 出力例 \\
+    \hline\hline
+    id & number & 各ファイターに割り当てたID & 0,1,2など \\
+    \hline
+    name & string & ファイター名 & マリオ，ドンキーコングなど \\
+    \hline
+    series & string & 各ファイターが登場する作品 & スーパーマリオ，ドンキーコングなど \\
+    \hline
+    nannido & string & プレイヤーの上位5\%であるVIPに到達する難易度 & ★★★★☆など \\
+    \hline
+\end{tabular}
+\label{hyou:sumabura_data_kouzou}
+\end{table}
+
+\subsubsection{ページ遷移}
+%このページ遷移の中にHTTPメソッドとリソース名を入れる
+%ページ遷移図も
+\label{page_senni:sumabura}
+本webアプリケーションがどのようにページ遷移をするかを表\ref{hyou:sumabura_page_senni}に，
+そのページ遷移図を図\ref{sennizu:sumabura}に示す．本システムのトップページは，\texttt{/sumabura}
+で，「一覧表示」の役割を担っている．第\ref{page_senni:tex}節と同様に，CRUDの要素である追加，編集，削除を行うと，
+遷移先としてトップページである\texttt{/sumabuta}にリダイレクト処理によって戻るような設計となっている．
+このCRUDによって，ユーザーインターフェース向上につなげている．
+
+\begin{table}[H]
+\centering
+\caption{スマブラファイター一覧のページ遷移}
+\begin{tabular}{c|c|c|c}
+    \hline
+    目的 & リソース名 & HTTPメソッド & 遷移先 \\
+    \hline\hline
+    一覧表示 & /sumabura & GET & sumabura.ejs \\
+    \hline
+    追加フォーム & /sumabura/create & GET & /public/sumabura\_new.html \\
+    \hline
+    詳細表示 & /sumabura/:number & GET & sumabura\_detail.ejs \\
+    \hline
+    追加 & /sumabura & POST & /sumabura （一覧表示に戻る） \\
+    \hline
+    編集 & /sumabura/edit/:number & GET & sumabura\_edit.ejs \\
+    \hline
+    更新 & /sumabura/update/:number & POST & /sumabura （一覧表示に戻る） \\
+    \hline
+    削除 & /sumabura/delete/:number & GET/POST & /sumabura （一覧表示に戻る） \\
+    \hline
+\end{tabular}
+\label{hyou:sumabura_page_senni}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{figs/sumabura_flow.png}
+\caption{スマブラファイター一覧のページ遷移図}
+\label{sennizu:sumabura}
+\end{figure}
+
+\subsubsection{リソースごとの機能の詳細}
+第\ref{page_senni:sumabura}節で作成した表を参考に，リソースごとの各機能について説明する．
+\texttt{/sumabura}の一覧表示するリソースでは，配列\texttt{sumabura\_data}に格納している
+データを\texttt{sumabura.ejs}に渡して表形式で表示する役割を持っている．その\texttt{/sumabura}
+に表示されるデータはURLとして機能し，\texttt{/sumabura/:number}の詳細表示のリンクとして
+とべるようになっている．\texttt{/sumabura/:number}の詳細表示を行うリソースでは，URLから
+取得したパスパラメータ\texttt{:number}を配列の番号として割り当て，\texttt{sumabura\_data[number]}
+によって特定のデータを抽出して\texttt{sumabura\_detail.ejs}にで表示する役割を持っている．
+\texttt{/sumabura/create}や\texttt{/sumabura}の追加の処理を行うリソースでは，追加ボタン
+を押すと，\texttt{/sumabura/create}にアクセスし，\texttt{sumabura\_new.html}にリダイレクトすることで，
+入力画面を表示する．フォーム送信時には，既存の最終データのIDに1を加算する\texttt{new\_id}を生成し，
+新しく作成したデータを配列の末尾に\texttt{push}により追加する役割を持っている．\texttt{/sumabura/edit/:sumabura}
+の編集を行うリソースでは，\texttt{sumabura\_data[number]}から，現在の値を読み込み，
+それを編集画面で表示する役割を持っている．\texttt{/sumabura/update/:number}の更新を行うリソースでは，
+送信されたデータで配列の該当する部分\texttt{sumabura\_data[number]}の各要素を直接上書きする機能を持っている．
+\texttt{/sumabura/delete/:number}の削除を行うリソースでは，パスパラメータで指定した場所を\texttt{splice}
+というコードの第1引数に渡し，配列から該当する要素を1件削除する．削除を行ったあとは，ファイター一覧のページである
+\texttt{/sumabura}にリダイレクトする．また，誤って削除ボタンを押した際に\texttt{onclick="return confirm()}
+を導入することで，誤って削除することを防ぐ利用者への配慮も行った．
 
 \section{管理者向けマニュアル}
+\subsection{インストール方法}
+本webアプリケーションを利用するには，JavaScript実行環境を整える必要がある．
+具体的には，\texttt{node.js}をダウンロードする必要がある．
+\texttt{node.js}はJavaScriptでOSの機能にアクセスするプログラムを書くことができるため，
+導入が必須である．\par
+そのような\texttt{node.js}をダウンロードするには，ターミナルを開き，ルートディレクトリで以下のコマンドを実行する．
+\begin{figure}[H]
+    \begin{lstlisting}[caption=node.jsのダウンロード方法, label=node.js_download, escapechar=\@]
+nodebrew install stable
+npm install -g npm
+    \end{lstlisting}
+\end{figure}
 
-\section{開発者向けマニュアル}
-\subsection{1つ目:tex数学記号一覧}
+次に，\texttt{node.js}がダウンロードできているか確認するために，以下のコードを実行する．
+\begin{figure}[H]
+    \begin{lstlisting}
+node -v
+    \end{lstlisting}
+\end{figure}
+このコードを実行したら，\texttt{v24.3.0}などのように表示されれば，\texttt{node.js}
+のダウンロードが完了し，実行環境の構築完了である．
 
-\subsection{2つ目:はま寿司メニュー一覧}
+\subsection{起動方法}
+ターミナルを開き，対象ディレクトリ（ここでは\texttt{webpro\_06}）まで移動し，
+以下のコードを実行することでWebサーバーを立ち上げることができる．
+\begin{figure}[H]
+    \begin{lstlisting}[caption=Webサーバーの起動方法, label=server_begin, escapechar=\@]
+node app_kadai.js
+    \end{lstlisting}
+\end{figure}
+起動に成功すると，ターミナル上に\texttt{Example app listening on port 8080!}
+というメッセージが出力される．
 
-\subsection{3つ目:大乱闘スマッシュブラザーズキャラクター一覧}
+\subsection{起動できない場合の対処法}
+起動ができない場合の主な原因は2つある．第一に，ポートを複数開いている可能性がある．
+具体的には，すでに他のプログラムが8080番ポートを使用している場合，起動に失敗する．
+このような場合は，使っていない方のプログラムのポートを終了させる必要がある．
+第二に，ディレクトリ指定を間違える原因である．これは，\texttt{app\_kadai.js}のある
+ディレクトリではない場所でソースコード\ref{server_begin}を実行してしまうことで起動できない場合がある．
+このような場合においては，\texttt{ls}コマンドで現在どの位置にいるかを確認し，正しいディレクトリへ
+移動することで解決することができる．
 
+\subsection{終了方法}
+サーバーを停止させるには，ソースコード\ref{server_begin}を実行中のターミナルで以下の
+コマンドを入力することで停止することができる．
+\begin{figure}[H]
+    \begin{lstlisting}[caption=Webサーバーの終了方法, label=server_end, escapechar=\@]
+Ctrl + C
+    \end{lstlisting}
+\end{figure}
 
+\subsection{わかっている不具合}
+わかっている不具合として，サーバーを終了すると，追加・編集・削除を行ったにも関わらず，
+初期化してしまう不具合がある．これは，データをサーバー実行時の変数内に格納していたためである．
+つまり，サーバーを停止したと同時にメモリ上の変数が削除されてしまうので，初期化されてしまう．
+このような不具合を解決するためには，外部データベースを活用することで解決することができる．
+
+\section{利用者向けマニュアル}
+\subsection{概要}
+本webアプリケーションは，はま寿司の様々なメニューをカテゴリごとに閲覧し，
+必要に応じてメニューの追加や内容の修正，削除を行うことができる管理システムである．
+
+\subsection{基本的な操作の流れ}
+%使用できる機能をかく
+%データの閲覧・追加・編集・削除ができることを簡潔に示す
+
+\subsection{操作手順の詳細}
+%このセクションはスクリーンショットを活用する
+\subsubsection{システムの起動}
+%起動画面
+\subsubsection{データの閲覧方法}
+%一覧表示・詳細表示
+\subsubsection{新しくデータを登録する方法}
+%データ追加
+\subsubsection{既存データの修正方法}
+%データ編集
+\subsubsection{データの削除方法}
+%データ削除
 \end{document}
+
+%開発者→概要のセクションにどの部分を変更したかと変更理由記述する

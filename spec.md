@@ -1,41 +1,6 @@
 # 開発者用仕様書（仮）
 
-## 1つ目　ToDoリスト
-
-###　データ構造
-#### ToDoリストの構造
-* 機能
-    * 完了したタスクの一覧を保つ
-* 構造
-    * id : number （ID）
-    * task : string （タスクの内容）
-    * done : boolean　（タスクの完了状態：trueかfalse）
-###　ページ遷移
-目的 | リソース名 | HTTPメソッド | 遷移先 |
--|-|-|-|
-一覧表示 | /todo | GET | todo.ejs
-追加 | /todo | POST | /todo
-詳細表示 | /todo/:id | GET | todo_detail.ejs
-編集 | /todo/edit/:id | GET | todo_edit.ejs
-更新 | /todo/update/:id | POST | /todo
-削除 | /todo/delete/:id | GET/POST | /todo
-
-### ページ遷移図
-```mermaid
-stateDiagram-v2
-    [*] --> 一覧表示
-    一覧表示 --> 詳細表示: タスク名をクリック
-    詳細表示 --> 一覧表示: タスク一覧に戻る
-    詳細表示 --> 編集: 編集ボタン
-    編集 --> 登録: 送信ボタン
-    登録 --> 一覧表示: タスク一覧に戻る
-    一覧表示 --> 追加: 追加ボタン
-    追加 --> 登録
-    詳細表示 --> 削除: 削除ボタン
-    削除 --> 一覧表示
-```
-
-##　2つ目　はま寿司のメニュー一覧
+##　1つ目　はま寿司のメニュー一覧
 
 ###　データ構造
 メニュー情報を配列として定義する．ランディングページに表示するメニュー（/hama_menu）とその詳細の（/hama_limited）などに分けている．
@@ -60,14 +25,14 @@ stateDiagram-v2
 ###　ページ遷移
 目的 | リソース名 | HTTPメソッド | 遷移先 
 -|-|-|-|
-カテゴリ一覧 | /menu | GET | hama_menu.ejs 
-メニュー一覧 | /menu/:url | GET | hama_menu_list.ejs 
+カテゴリ一覧 | /menu | GET | hama.ejs 
+メニュー一覧 | /menu/:url | GET | hama_menu.ejs 
 追加フォーム | /menu/:url/create | GET | hama_menu_new.html 
-新規追加 | /menu/:url | POST | /menu/:url 
+新規追加 | /menu/:url/create | POST | /menu/:url 
 詳細表示 | /menu/:url/:number | GET | hama_menu_detail.ejs
-編集 | /menu/:url/:number/edit | GET | hama_menu_edit.ejs
-更新 | /menu/:url/:number | POST | /menu/:url
-削除 | /menu/:url/:number/delete | GET | /menu/:url
+編集 | /menu/:url/edit/:number | GET | hama_menu_edit.ejs
+更新 | /menu/:url/update/:number | POST | /menu/:url
+削除 | /menu/:url/delete/:number | GET | /menu/:url
 
 
 ### ページ遷移図
@@ -88,10 +53,47 @@ stateDiagram-v2
     編集 --> 登録
 
     登録 --> メニュー一覧: メニュー一覧に戻る
-    登録 --> カテゴリ一覧: カテゴリ一覧に戻る
     
     削除 --> メニュー一覧
 
+```
+
+## 2つ目　tex数学記号一覧
+
+###　データ構造
+#### tex数学記号一覧の構造
+* 機能
+    * texで使うことができる数学記号を参照できる
+* 構造
+    * id : number （ID）
+    * symbol : string （どのような記号の種類かを示す　例：=，≠など）
+    * name : string （記号の名称　例：等号，不等号など）
+    * command : string　（texでどのようなコマンドを使えば出力されるか　例:=，\neq"など）
+    * genre : string （どのようなジャンルで数式記号を使えるか　例:等号，不等号，演算子など）
+    * mean : string （その記号がどのような意味を持つか　例：等しいことを示す，等しくないことを示す，など）
+###　ページ遷移
+目的 | リソース名 | HTTPメソッド | 遷移先 |
+-|-|-|-|
+一覧表示 | /tex | GET | tex.ejs
+追加 | /tex | POST | /tex
+詳細表示 | /tex/:number | GET | tex_detail.ejs
+編集 | /tex/edit/:number | GET | tex_edit.ejs
+更新 | /tex/update/:number | POST | /tex
+削除 | /tex/delete/:number | GET| /tex
+
+### ページ遷移図
+```mermaid
+stateDiagram-v2
+    [*] --> 一覧表示
+    一覧表示 --> 詳細表示: 記号名をクリック
+    詳細表示 --> 一覧表示: 数式記号一覧に戻る
+    詳細表示 --> 編集: 編集ボタン
+    編集 --> 登録: 送信ボタン
+    登録 --> 一覧表示: 数式記号一覧に戻る
+    一覧表示 --> 追加: 追加ボタン
+    追加 --> 登録
+    詳細表示 --> 削除: 削除ボタン
+    削除 --> 一覧表示
 ```
 
 ##　3つ目　大乱闘スマッシュブラザーズに登場するキャラクター一覧
